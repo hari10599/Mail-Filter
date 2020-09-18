@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mail Filter</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/sl-1.2.5/datatables.min.css">
+  <link rel="stylesheet" type="text/css" href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.10/css/dataTables.checkboxes.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/sl-1.2.5/datatables.min.js"></script>
+  <script type="text/javascript" src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.10/js/dataTables.checkboxes.min.js"></script>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <style type="text/css">
+    
+.w3-myfont {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+#logoutButton {
+  
+  margin-left:200px;
+  margin-top:-60px;
+}
+
+#moveButton {
+  margin-left:200px;
+  margin-top:-60px;
+}
+
+  </style>
+
+</head>
+<body>
+  <div class="container">
+<div class=" w3-display w3-myfont">
+  <p class="w3-large">Mail Count : {{totalCount}}</p>
+  <p class="w3-large">Last Refresh : {{time}}</p>
+
+<form id="for-refresh" action = "{% url 'refresh'%}" method = "GET">
+  <button class="w3-btn w3-black" id = "refreshButton">REFRESH</button>
+</form>
+<form id="for-logout" action = "{% url 'logout'%}" method = "GET">
+
+  <button class="w3-btn w3-black" id = "logoutButton">LOGOUT</button>
+</form>
+
+</div>
+<form id="frm-example" action="{% url 'delete' %}" method="POST">
+  {% csrf_token %}
+<table id="example" class="display" cellspacing="0" width="100%">
+   <thead>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th>MailId</th>
+        <th>Count</th>
+      </tr>
+   </thead>
+   <tfoot>
+      <tr>
+        <th></th>
+         <th>Name</th>
+         <th>MailId</th>
+         <th>Count</th>
+         </tr>
+   </tfoot>
+</table>
+<div class=" w3-display w3-myfont">
+  <button class="w3-btn w3-black" id = "deleteButton">Delete Permanently</button>
+</form>
+<form id="for-move" action = "{% url 'move'%}" method = "POST">
+    {% csrf_token %}
+  <button class="w3-btn w3-black" id = "moveButton">Move to Mail Filter</button>
+</form>
+</div>
+</div>
+
+</body>
+</html>
+<script type="text/javascript">
+    var final  = {{data|safe}};
+    $(document).ready(function() {
+    var table = $('#example').DataTable({
+      data: final.data,
+      'columnDefs': [
+         {
+            'targets': 0,
+            'checkboxes': {
+               'selectRow': true
+            }
+         }
+      ],
+      'select': {
+         'style': 'multi'
+      },
+      'order': [[1, 'asc']]
+    });
+    $('#frm-example').on('submit', function(e){
+      var form = this;
+      
+      var rows_selected = table.column(0).checkboxes.selected();
+
+      // Iterate over all selected checkboxes
+      $.each(rows_selected, function(index, rowId){
+         // Create a hidden element 
+         $(form).append(
+             $('<input>')
+                .attr('type', 'hidden')
+                .attr('name', 'id[]')
+                .val(rowId)
+         );
+      });
+   });
+
+    $('#for-move').on('submit', function(e){
+      var form = this;
+      
+      var rows_selected = table.column(0).checkboxes.selected();
+
+      // Iterate over all selected checkboxes
+      $.each(rows_selected, function(index, rowId){
+         // Create a hidden element 
+         $(form).append(
+             $('<input>')
+                .attr('type', 'hidden')
+                .attr('name', 'moveId[]')
+                .val(rowId)
+         );
+      });
+   });
+   
+});
+
+
+</script>
+
