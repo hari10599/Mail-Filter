@@ -12,10 +12,9 @@ flow = InstalledAppFlow.from_client_secrets_file(
     redirect_uri = json.load(open('client_secret.json'))['web']['redirect_uris'][0])
 
 def home(request):
-    try:
-        request.session['credentials']
+    if 'credentials' in request.session:
         return redirect('/table/')
-    except:
+    else:
         return render(request, 'login.html')
 
 def authenticate(request):
